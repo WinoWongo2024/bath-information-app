@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EmailSim v1.0 | Dashboard</title>
+    <title>ÖestVèl Mail | Login</title>
     <style>
         :root {
             --primary: #2c3e50;
@@ -11,6 +11,7 @@
             --bg: #f4f7f6;
             --white: #ffffff;
             --text: #333;
+            --border: #dcdde1;
         }
 
         body {
@@ -32,20 +33,51 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             width: 100%;
             max-width: 450px;
-            transition: all 0.3s ease;
         }
 
         .hidden { display: none !important; }
 
         /* Auth Screen Styling */
-        h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary); }
-        .price-tag { color: #27ae60; font-weight: bold; margin-bottom: 1.5rem; display: block; }
+        h1 { font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--primary); text-align: center; }
+        .sub-text { text-align: center; font-size: 0.85rem; color: #7f8c8d; margin-bottom: 1.5rem; display: block; }
 
-        input {
+        label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; color: var(--primary); }
+
+        /* Domain Input Group */
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .domain-suffix {
+            background: #f8f9fa;
+            padding: 0 15px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            color: #7f8c8d;
+            font-weight: 500;
+            border-left: 1px solid var(--border);
+            user-select: none;
+        }
+
+        .standard-input {
             width: 100%;
             padding: 12px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
             border-radius: 6px;
             box-sizing: border-box;
             font-size: 1rem;
@@ -82,95 +114,91 @@
             border: 1px solid #eee;
             margin-bottom: 10px;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: background 0.2s;
         }
 
-        .email-item:hover { background: #f9f9f9; transform: translateY(-2px); }
-
+        .email-item:hover { background: #f9f9f9; }
         .sender { font-weight: bold; font-size: 0.95rem; display: block; }
         .subject { color: #666; font-size: 0.85rem; }
         .timestamp { float: right; font-size: 0.75rem; color: #999; }
 
-        /* Reading View */
-        #reading-pane {
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-            margin-top: 20px;
-        }
-
-        .btn-back {
-            background: none;
-            color: var(--accent);
-            width: auto;
-            padding: 0;
-            margin-bottom: 10px;
-            text-decoration: underline;
-        }
+        #reading-pane { border-top: 1px solid #eee; padding-top: 20px; }
+        .btn-back { background: none; color: var(--accent); width: auto; padding: 0; margin-bottom: 10px; text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <div id="auth-screen" class="container">
-        <h1>Company Email Setup</h1>
-        <span class="price-tag">License Fee: VC€ 0.00</span>
+        <h1>ÖestVèl Centrè Portal</h1>
+        <span class="sub-text">Setup your @ostvl.ov identity</span>
         
-        <input type="text" id="user-name" placeholder="Full Name" required>
-        <input type="email" id="user-email" placeholder="desired@company.com" required>
+        <label>Full Name</label>
+        <input type="text" id="user-name" class="standard-input" placeholder="e.g. Jess" required>
+
+        <label>Work Email</label>
+        <div class="input-group">
+            <input type="text" id="user-handle" placeholder="username" required>
+            <div class="domain-suffix">@ostvl.ov</div>
+        </div>
         
-        <button onclick="handleSignUp()">Create Account</button>
+        <button onclick="handleSignUp()">Activate Simulator</button>
+        <p style="font-size: 0.7rem; text-align: center; color: #bdc3c7; margin-top: 15px;">
+            Connection Fee: VC€ 0.00 | Secure Node: Bath/Bargh
+        </p>
     </div>
 
     <div id="app-screen" class="container hidden">
         <header>
-            <h2 id="welcome-msg">Inbox</h2>
-            <button style="width:auto; padding: 5px 10px;" onclick="location.reload()">Logout</button>
+            <h2 id="welcome-msg" style="margin:0; font-size: 1.2rem;">Inbox</h2>
+            <button style="width:auto; padding: 5px 10px; font-size: 0.8rem;" onclick="location.reload()">Logout</button>
         </header>
 
         <div id="inbox-view">
-            <div id="email-list">
-                </div>
+            <div id="email-list"></div>
         </div>
 
         <div id="reading-pane" class="hidden">
             <button class="btn-back" onclick="toggleView('inbox')">← Back to Inbox</button>
-            <h3 id="read-subject"></h3>
+            <h3 id="read-subject" style="margin-top:10px;"></h3>
             <p id="read-sender" style="font-size: 0.8rem; color: #777;"></p>
             <hr>
-            <p id="read-body"></p>
+            <div id="read-body" style="line-height: 1.5; font-size: 0.95rem;"></div>
         </div>
     </div>
 
     <script>
         const state = {
             currentUser: "",
+            fullEmail: "",
             emails: []
         };
 
         function handleSignUp() {
-            const nameInput = document.getElementById('user-name').value;
-            const emailInput = document.getElementById('user-email').value;
+            const name = document.getElementById('user-name').value;
+            const handle = document.getElementById('user-handle').value;
 
-            if (!nameInput || !emailInput) {
-                alert("Please fill in all fields.");
+            if (!name || !handle) {
+                alert("Please provide both your name and preferred username.");
                 return;
             }
 
-            state.currentUser = nameInput;
+            state.currentUser = name;
+            state.fullEmail = `${handle}@ostvl.ov`;
 
-            // Generate the automatic welcome email
+            // Create the welcome email
             const welcomeEmail = {
                 id: Date.now(),
                 sender: "Admin @ ÖestVèl Systems",
-                subject: "Account Activation Successful",
-                body: `Hi ${nameInput},<br><br>Welcome to the team! Thanks for enjoying this email sim. This confirms your internal address at ${emailInput} is now live.<br><br>Regards,<br>System Ops`,
+                subject: "System Integration Confirmed",
+                body: `Hello ${name},<br><br>Success! Your simulation profile is now active at <strong>${state.fullEmail}</strong>.<br><br>We have successfully migrated the data to the new <strong>ÖestVèl Centrè (Bath/Bargh)</strong> servers.<br><br>Thank you for enjoying this email sim!<br><br>Regards,<br>IT Support`,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
             state.emails.push(welcomeEmail);
 
-            // UI Switch
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
+            document.getElementById('welcome-msg').innerText = `Inbox (${state.fullEmail})`;
             renderInbox();
         }
 
