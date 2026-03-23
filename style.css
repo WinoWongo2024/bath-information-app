@@ -1,48 +1,79 @@
-body {
-    background-color: #f0f2f5;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    justify-content: center;
-    padding: 40px;
+// Coordinates & Logic
+const locations = [
+    { name: "John O'groats", lat: 58.637, lng: -3.068 },
+    { name: "Edinburgh", lat: 55.953, lng: -3.188 },
+    { name: "Newcastle", lat: 54.978, lng: -1.617 },
+    { name: "Manchester", lat: 53.480, lng: -2.242 },
+    { name: "Bristol", lat: 51.454, lng: -2.587 },
+    { name: "Bath", lat: 51.375, lng: -2.361 },
+    { name: "London", lat: 51.507, lng: -0.127 },
+    { name: "Penzance", lat: 50.118, lng: -5.537 },
+    { name: "Radstock", lat: 51.291, lng: -2.447 },
+    { name: "Midsomer Norton", lat: 51.285, lng: -2.483 }
+];
+
+// Boundaries (Approximate Longitudes)
+const KEYNSHAM_LNG = -2.497;
+const BRADFORD_LNG = -2.250;
+
+const map = L.map('map').setView([54.5, -2.5], 6);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+function getFlipTime(lng, name) {
+    let now = new Date();
+    let offsetMinutes = 0;
+
+    // Special Case: The Peasedown Gap (Radstock/MSN/Paulton)
+    const specialZones = ["Radstock", "Midsomer Norton", "Paulton"];
+    
+    if (specialZones.includes(name)) {
+        offsetMinutes = 30;
+    } else if (lng < KEYNSHAM_LNG) {
+        offsetMinutes = -60; // West (UTC-1)
+    } else if (lng > BRADFORD_LNG) {
+        offsetMinutes = 60;  // East (UTC+1)
+    } else {
+        offsetMinutes = 0;   // Central (UTC-0)
+    }
+
+    const localDate = new Date(now.getTime() + offsetMinutes * 60000);
+    const h = String(localDate.getHours()).padStart(2, '0');
+    const m = String(localDate.getMinutes()).padStart(2, '0');
+    const s = String(localDate.getSeconds()).padStart(2, '0');
+
+    return `<div class="flip-clock">
+                <span class="flip-unit">${h}</span>:
+                <span class="flip-unit">${m}</span>:
+                <span class="flip-unit">${s}</span>
+            </div>`;
 }
 
-.clock-container {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 450px;
-}
+// Render Markers
+locations.forEach(loc => {
+    const marker = L.marker([loc.lat, loc.lng]).addTo(map);
+    
+    const updatePopup = () => {
+        const timeHtml = getFlipTime(loc.lng, loc.name);
+        marker.bindPopup(`
+            <div class="popup-card">
+                <b>${loc.name}</b><br>${timeHtml}
+                <div class="vc-price">Entry: VC€ 15.00</div>
+            </div>
+        `).openPopup();
+    };
 
-h1 {
-    color: #2c3e50;
-    text-align: center;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 10px;
-}
+    marker.on('click', updatePopup);
+});
 
-.location-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.location-name {
-    font-weight: 600;
-    color: #34495e;
-}
-
-.time-val {
-    font-family: 'Courier New', Courier, monospace;
-    color: #e67e22;
-    font-weight: bold;
-}
-
-.footer {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 0.8rem;
-    color: #95a5a6;
-}
+// Auto-refresh the open popup every second for the clock effect
+setInterval(() => {
+    const openPopup = document.querySelector('.leaflet-popup-content');
+    if (openPopup) {
+        const name = openPopup.querySelector('b').innerText;
+        const loc = locations.find(l => l.name === name);
+        if (loc) {
+            openPopup.querySelector('.flip-clock').outerHTML = getFlipTime(loc.lng, loc.name);
+        }
+    }
+}, 1000);
