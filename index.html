@@ -3,164 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÖestVèl Geotemporal UK Registry</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>EmailSim v1.0 | Dashboard</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #0b0e14; }
-        #map { height: 100vh; width: 100%; background: #1a1d23; }
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f4f7f6;
+            --white: #ffffff;
+            --text: #333;
+        }
 
-        .digital-clock {
-            background: #000;
-            color: #00ff41;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 1.4rem;
-            border: 1px solid #333;
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding-top: 50px;
+        }
+
+        .container {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            transition: all 0.3s ease;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Auth Screen Styling */
+        h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary); }
+        .price-tag { color: #27ae60; font-weight: bold; margin-bottom: 1.5rem; display: block; }
+
+        input {
+            width: 100%;
+            padding: 12px;
             margin: 8px 0;
-            display: inline-block;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
         }
 
-        .popup-container { text-align: center; min-width: 160px; }
-        .location-header { font-weight: bold; font-size: 1.1rem; color: #333; }
-        .zone-tag { font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
-
-        .legend {
-            position: absolute; top: 10px; right: 10px; z-index: 1000;
-            background: rgba(255, 255, 255, 0.9); padding: 15px; border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5); width: 220px;
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
         }
-        .legend h4 { margin: 0 0 10px 0; color: #2c3e50; border-bottom: 2px solid #3498db; }
-        .line-key { display: flex; align-items: center; margin: 5px 0; font-size: 0.85rem; }
-        .line-sample { width: 30px; height: 3px; margin-right: 10px; }
+
+        button:hover { background-color: #1a252f; }
+
+        /* Inbox Styling */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .email-item {
+            padding: 15px;
+            border-radius: 8px;
+            background: #fff;
+            border: 1px solid #eee;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .email-item:hover { background: #f9f9f9; transform: translateY(-2px); }
+
+        .sender { font-weight: bold; font-size: 0.95rem; display: block; }
+        .subject { color: #666; font-size: 0.85rem; }
+        .timestamp { float: right; font-size: 0.75rem; color: #999; }
+
+        /* Reading View */
+        #reading-pane {
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .btn-back {
+            background: none;
+            color: var(--accent);
+            width: auto;
+            padding: 0;
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
-    <div id="map"></div>
-
-    <div class="legend">
-        <h4>7-Zone UK Registry</h4>
-        <div class="line-key"><div class="line-sample" style="background: #e74c3c;"></div> Zone 1 (West -1:00)</div>
-        <div class="line-key"><div class="line-sample" style="background: #f1c40f;"></div> Zone 2 (-0:40)</div>
-        <div class="line-key"><div class="line-sample" style="background: #2ecc71;"></div> Zone 3 (-0:20)</div>
-        <div class="line-key"><div class="line-sample" style="background: #3498db; border: 2px dashed #000;"></div> Bath Center (0:00)</div>
-        <div class="line-key"><div class="line-sample" style="background: #9b59b6;"></div> Zone 5 (+0:20)</div>
-        <div class="line-key"><div class="line-sample" style="background: #e67e22;"></div> Zone 6 (+0:40)</div>
-        <div class="line-key"><div class="line-sample" style="background: #34495e;"></div> Zone 7 (East +1:00)</div>
-        <hr>
-        <div class="line-key"><div class="line-sample" style="background: #ff6b6b; height: 10px; border-radius: 50%;"></div> The Gap (+0:30)</div>
-        <div style="font-size: 0.75rem; color: #7f8c8d; margin-top: 5px;">Currency: VC€ 1.96</div>
+    <div id="auth-screen" class="container">
+        <h1>Company Email Setup</h1>
+        <span class="price-tag">License Fee: VC€ 0.00</span>
+        
+        <input type="text" id="user-name" placeholder="Full Name" required>
+        <input type="email" id="user-email" placeholder="desired@company.com" required>
+        
+        <button onclick="handleSignUp()">Create Account</button>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <div id="app-screen" class="container hidden">
+        <header>
+            <h2 id="welcome-msg">Inbox</h2>
+            <button style="width:auto; padding: 5px 10px;" onclick="location.reload()">Logout</button>
+        </header>
+
+        <div id="inbox-view">
+            <div id="email-list">
+                </div>
+        </div>
+
+        <div id="reading-pane" class="hidden">
+            <button class="btn-back" onclick="toggleView('inbox')">← Back to Inbox</button>
+            <h3 id="read-subject"></h3>
+            <p id="read-sender" style="font-size: 0.8rem; color: #777;"></p>
+            <hr>
+            <p id="read-body"></p>
+        </div>
+    </div>
 
     <script>
-        // Boundary Longitudes for 7 Zones across UK (~ -8 to +2 longitude)
-        const boundaries = [
-            { lng: -6.0, color: '#e74c3c', offset: -60 }, // Zone 1
-            { lng: -4.5, color: '#f1c40f', offset: -40 }, // Zone 2
-            { lng: -3.0, color: '#2ecc71', offset: -20 }, // Zone 3
-            { lng: -2.498, color: '#3498db', offset: 0, name: 'BATH_WEST' },  // Keynsham Line
-            { lng: -2.251, color: '#3498db', offset: 0, name: 'BATH_EAST' },  // Bradford Line
-            { lng: -1.0, color: '#9b59b6', offset: 20 },  // Zone 5
-            { lng: 0.5, color: '#e67e22', offset: 40 },   // Zone 6
-            { lng: 2.0, color: '#34495e', offset: 60 }    // Zone 7
-        ];
+        const state = {
+            currentUser: "",
+            emails: []
+        };
 
-        const locations = [
-            { name: "John O'groats", lat: 58.637, lng: -3.068 },
-            { name: "Edinburgh", lat: 55.953, lng: -3.188 },
-            { name: "Newcastle", lat: 54.978, lng: -1.617 },
-            { name: "Manchester", lat: 53.480, lng: -2.242 },
-            { name: "Bristol", lat: 51.454, lng: -2.587 },
-            { name: "Bath", lat: 51.375, lng: -2.361 },
-            { name: "London", lat: 51.507, lng: -0.127 },
-            { name: "Penzance", lat: 50.118, lng: -5.537 },
-            { name: "Radstock", lat: 51.291, lng: -2.447, isGap: true },
-            { name: "Midsomer Norton", lat: 51.285, lng: -2.483, isGap: true },
-            { name: "Paulton", lat: 51.306, lng: -2.502, isGap: true }
-        ];
+        function handleSignUp() {
+            const nameInput = document.getElementById('user-name').value;
+            const emailInput = document.getElementById('user-email').value;
 
-        const map = L.map('map').setView([54.5, -2.5], 6);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-
-        // Draw Vertical Boundary Lines
-        boundaries.forEach(b => {
-            const lineCoords = [[49, b.lng], [61, b.lng]];
-            L.polyline(lineCoords, {
-                color: b.color,
-                weight: b.name ? 4 : 2,
-                dashArray: b.name ? '10, 10' : null,
-                opacity: 0.8
-            }).addTo(map);
-        });
-
-        // The Gap Area Geofence (Orange Circle)
-        L.circle([51.291, -2.46], {
-            radius: 4500,
-            color: '#ff6b6b',
-            fillColor: '#ff6b6b',
-            fillOpacity: 0.2,
-            weight: 2
-        }).addTo(map);
-
-        function calculateTime(loc) {
-            let now = new Date();
-            let offsetMinutes = 0;
-
-            if (loc.isGap) {
-                offsetMinutes = 30; // The Gap Logic
-            } else {
-                // Determine zone based on longitude
-                if (loc.lng < boundaries[0].lng) offsetMinutes = -60;
-                else if (loc.lng < boundaries[1].lng) offsetMinutes = -40;
-                else if (loc.lng < boundaries[2].lng) offsetMinutes = -20;
-                else if (loc.lng < boundaries[4].lng) offsetMinutes = 0; // Bath/Central Zone
-                else if (loc.lng < boundaries[5].lng) offsetMinutes = 20;
-                else if (loc.lng < boundaries[6].lng) offsetMinutes = 40;
-                else offsetMinutes = 60;
+            if (!nameInput || !emailInput) {
+                alert("Please fill in all fields.");
+                return;
             }
 
-            const localDate = new Date(now.getTime() + offsetMinutes * 60000);
-            return {
-                time: localDate.toTimeString().split(' ')[0],
-                offset: offsetMinutes
+            state.currentUser = nameInput;
+
+            // Generate the automatic welcome email
+            const welcomeEmail = {
+                id: Date.now(),
+                sender: "Admin @ ÖestVèl Systems",
+                subject: "Account Activation Successful",
+                body: `Hi ${nameInput},<br><br>Welcome to the team! Thanks for enjoying this email sim. This confirms your internal address at ${emailInput} is now live.<br><br>Regards,<br>System Ops`,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
+
+            state.emails.push(welcomeEmail);
+
+            // UI Switch
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            renderInbox();
         }
 
-        locations.forEach(loc => {
-            const marker = L.marker([loc.lat, loc.lng]).addTo(map);
-            
-            const updatePopup = () => {
-                const data = calculateTime(loc);
-                const content = `
-                    <div class="popup-container">
-                        <div class="zone-tag">Offset: ${data.offset >= 0 ? '+' : ''}${data.offset}m</div>
-                        <div class="location-header">${loc.name}</div>
-                        <div class="digital-clock">${data.time}</div>
-                        <div style="font-size:0.7rem">System: ÖestVèl OVST</div>
-                    </div>
+        function renderInbox() {
+            const list = document.getElementById('email-list');
+            list.innerHTML = "";
+
+            state.emails.forEach(email => {
+                const div = document.createElement('div');
+                div.className = "email-item";
+                div.onclick = () => openEmail(email.id);
+                div.innerHTML = `
+                    <span class="timestamp">${email.time}</span>
+                    <span class="sender">${email.sender}</span>
+                    <span class="subject">${email.subject}</span>
                 `;
-                marker.bindPopup(content, { closeButton: false }).openPopup();
-            };
+                list.appendChild(div);
+            });
+        }
 
-            marker.on('click', updatePopup);
-        });
+        function openEmail(id) {
+            const email = state.emails.find(e => e.id === id);
+            if (!email) return;
 
-        // Refresh loop for the active clock
-        setInterval(() => {
-            const activePopup = document.querySelector('.leaflet-popup-content');
-            if (activePopup) {
-                const cityName = activePopup.querySelector('.location-header').innerText;
-                const loc = locations.find(l => l.name === cityName);
-                if (loc) {
-                    const data = calculateTime(loc);
-                    activePopup.querySelector('.digital-clock').innerText = data.time;
-                }
+            document.getElementById('read-subject').innerText = email.subject;
+            document.getElementById('read-sender').innerText = `From: ${email.sender}`;
+            document.getElementById('read-body').innerHTML = email.body;
+
+            toggleView('reading');
+        }
+
+        function toggleView(view) {
+            if (view === 'reading') {
+                document.getElementById('inbox-view').classList.add('hidden');
+                document.getElementById('reading-pane').classList.remove('hidden');
+            } else {
+                document.getElementById('inbox-view').classList.remove('hidden');
+                document.getElementById('reading-pane').classList.add('hidden');
             }
-        }, 1000);
-
+        }
     </script>
 </body>
 </html>
