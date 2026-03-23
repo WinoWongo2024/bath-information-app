@@ -2,20 +2,144 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÖestVèl Geotemporal Map</title>
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #map { height: 100vh; width: 100%; }
+
+        /* LED Digital Clock Style */
+        .digital-clock {
+            background: #000;
+            color: #00ff41; /* Matrix Green */
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: inline-block;
+            border: 2px solid #333;
+            box-shadow: inset 0 0 10px #000;
+            margin: 10px 0;
+        }
+
+        .popup-container { text-align: center; color: #333; min-width: 150px; }
+        .location-header { font-size: 1.2rem; margin-bottom: 5px; color: #2c3e50; }
+        .currency-tag { color: #27ae60; font-weight: bold; font-size: 0.9rem; }
+
+        /* Legend */
+        .legend {
+            position: absolute; bottom: 30px; left: 10px; z-index: 1000;
+            background: white; padding: 15px; border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); line-height: 1.5;
+        }
+        .legend h4 { margin: 0 0 10px 0; border-bottom: 1px solid #ddd; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 5px; }
+        .box { width: 18px; height: 18px; margin-right: 10px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.2); }
+    </style>
 </head>
 <body>
+
     <div id="map"></div>
+
     <div class="legend">
-        <h4>Timezone Key</h4>
-        <div><span class="box utc-1"></span> West (UTC-1)</div>
-        <div><span class="box utc-0"></span> Central (UTC+0)</div>
-        <div><span class="box utc-30"></span> Gap (UTC+0:30)</div>
-        <div><span class="box utc-plus-1"></span> East (UTC+1)</div>
+        <h4>ÖestVèl Timezones</h4>
+        <div class="legend-item"><div class="box" style="background: rgba(255, 0, 0, 0.2);"></div> West (UTC -1:00)</div>
+        <div class="legend-item"><div class="box" style="background: rgba(255, 255, 255, 0.5);"></div> Central (UTC +0:00)</div>
+        <div class="legend-item"><div class="box" style="background: rgba(255, 165, 0, 0.3);"></div> The Gap (UTC +0:30)</div>
+        <div class="legend-item"><div class="box" style="background: rgba(0, 0, 255, 0.2);"></div> East (UTC +1:00)</div>
+        <div style="margin-top:10px; font-size: 0.8rem; color: #666;">Rate: £1 = VC€ 1.96</div>
     </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="script.js"></script>
+
+    <script>
+        // Boundary Longitudes
+        const KEYNSHAM_LNG = -2.498;
+        const BRADFORD_LNG = -2.251;
+
+        // Locations Data
+        const locations = [
+            { name: "John O'groats", lat: 58.637, lng: -3.068 },
+            { name: "Edinburgh", lat: 55.953, lng: -3.188 },
+            { name: "Newcastle", lat: 54.978, lng: -1.617 },
+            { name: "Manchester", lat: 53.480, lng: -2.242 },
+            { name: "Bristol", lat: 51.454, lng: -2.587 },
+            { name: "Bath", lat: 51.375, lng: -2.361 },
+            { name: "London", lat: 51.507, lng: -0.127 },
+            { name: "Penzance", lat: 50.118, lng: -5.537 },
+            { name: "Radstock", lat: 51.291, lng: -2.447, isGap: true },
+            { name: "Midsomer Norton", lat: 51.285, lng: -2.483, isGap: true },
+            { name: "Paulton", lat: 51.306, lng: -2.502, isGap: true }
+        ];
+
+        // Initialize Map
+        const map = L.map('map').setView([51.375, -2.361], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Zone Overlays
+        // West Zone (Red)
+        L.rectangle([[48, -10], [61, KEYNSHAM_LNG]], {color: "red", weight: 0, fillOpacity: 0.1}).addTo(map);
+        // East Zone (Blue)
+        L.rectangle([[48, BRADFORD_LNG], [61, 2]], {color: "blue", weight: 0, fillOpacity: 0.1}).addTo(map);
+        // The Gap (Orange - Simplified Circle for Peasedown Area)
+        L.circle([51.29, -2.46], {radius: 4000, color: "orange", weight: 2, fillOpacity: 0.2}).addTo(map);
+
+        function calculateTime(loc) {
+            let now = new Date();
+            let offsetMinutes = 0;
+
+            if (loc.isGap) {
+                offsetMinutes = 30; // UTC +0:30
+            } else if (loc.lng < KEYNSHAM_LNG) {
+                offsetMinutes = -60; // UTC -1:00
+            } else if (loc.lng > BRADFORD_LNG) {
+                offsetMinutes = 60;  // UTC +1:00
+            }
+
+            const localDate = new Date(now.getTime() + offsetMinutes * 60000);
+            return localDate.toTimeString().split(' ')[0]; // Returns HH:MM:SS
+        }
+
+        // Add Markers
+        const markers = [];
+        locations.forEach(loc => {
+            const marker = L.marker([loc.lat, loc.lng]).addTo(map);
+            marker.locationData = loc;
+            
+            const updatePopup = () => {
+                const timeStr = calculateTime(loc);
+                const content = `
+                    <div class="popup-container">
+                        <div class="location-header">${loc.name}</div>
+                        <div class="digital-clock">${timeStr}</div>
+                        <div class="currency-tag">Local Tax: VC€ 1.20</div>
+                    </div>
+                `;
+                marker.bindPopup(content, { closeButton: false });
+            };
+
+            marker.on('click', updatePopup);
+            markers.push(marker);
+        });
+
+        // Update active popup clock every second
+        setInterval(() => {
+            const activePopup = document.querySelector('.leaflet-popup-content');
+            if (activePopup) {
+                const cityName = activePopup.querySelector('.location-header').innerText;
+                const loc = locations.find(l => l.name === cityName);
+                if (loc) {
+                    activePopup.querySelector('.digital-clock').innerText = calculateTime(loc);
+                }
+            }
+        }, 1000);
+
+    </script>
 </body>
 </html>
