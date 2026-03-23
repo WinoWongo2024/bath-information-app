@@ -3,241 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÖestVèl Mail | Login</title>
+    <title>ÖestVèl Centrè | Mail Gateway</title>
     <style>
         :root {
-            --primary: #2c3e50;
+            --sidebar-bg: #2c3e50;
+            --sidebar-hover: #34495e;
+            --top-bar: #ffffff;
+            --bg-light: #f8f9fa;
             --accent: #3498db;
-            --bg: #f4f7f6;
-            --white: #ffffff;
-            --text: #333;
-            --border: #dcdde1;
+            --border: #e0e0e0;
+            --text-main: #2d3436;
         }
 
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding-top: 50px;
-        }
-
-        .container {
-            background: var(--white);
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 450px;
-        }
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: var(--bg-light); }
 
         .hidden { display: none !important; }
 
-        /* Auth Screen Styling */
-        h1 { font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--primary); text-align: center; }
-        .sub-text { text-align: center; font-size: 0.85rem; color: #7f8c8d; margin-bottom: 1.5rem; display: block; }
-
-        label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; color: var(--primary); }
-
-        /* Domain Input Group */
-        .input-group {
+        /* FULL PAGE LOGIN */
+        #login-page {
+            height: 100vh;
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            justify-content: center;
+            background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .login-box h1 { margin-top: 0; font-size: 1.5rem; color: var(--sidebar-bg); border-bottom: 2px solid var(--accent); display: inline-block; }
+
+        .input-group {
+            display: flex;
             border: 1px solid var(--border);
             border-radius: 6px;
+            margin: 20px 0;
             overflow: hidden;
         }
 
-        .input-group input {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            outline: none;
-            font-size: 1rem;
-        }
+        .input-group input { border: none; padding: 12px; flex: 1; outline: none; font-size: 1rem; }
+        .domain { background: #eee; padding: 12px; color: #666; font-weight: bold; border-left: 1px solid var(--border); }
 
-        .domain-suffix {
-            background: #f8f9fa;
-            padding: 0 15px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            color: #7f8c8d;
-            font-weight: 500;
-            border-left: 1px solid var(--border);
-            user-select: none;
-        }
-
-        .standard-input {
+        .btn-login {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary);
+            padding: 14px;
+            background: var(--sidebar-bg);
             color: white;
             border: none;
             border-radius: 6px;
+            font-weight: bold;
             cursor: pointer;
-            font-weight: 600;
-            margin-top: 10px;
+            transition: transform 0.2s;
         }
 
-        button:hover { background-color: #1a252f; }
+        .btn-login:hover { background: var(--accent); transform: translateY(-2px); }
 
-        /* Inbox Styling */
+        /* FULL PAGE APP LAYOUT */
+        #app-page {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            grid-template-rows: 60px 1fr;
+            height: 100vh;
+        }
+
         header {
+            grid-column: 1 / 3;
+            background: var(--top-bar);
+            border-bottom: 1px solid var(--border);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--bg);
-            padding-bottom: 15px;
-            margin-bottom: 15px;
+            justify-content: space-between;
+            padding: 0 20px;
         }
 
-        .email-item {
-            padding: 15px;
-            border-radius: 8px;
-            background: #fff;
-            border: 1px solid #eee;
-            margin-bottom: 10px;
+        nav {
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 20px 0;
+        }
+
+        nav ul { list-style: none; padding: 0; margin: 0; }
+        nav li {
+            padding: 12px 25px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
         }
 
-        .email-item:hover { background: #f9f9f9; }
-        .sender { font-weight: bold; font-size: 0.95rem; display: block; }
-        .subject { color: #666; font-size: 0.85rem; }
-        .timestamp { float: right; font-size: 0.75rem; color: #999; }
+        nav li:hover { background: var(--sidebar-hover); }
+        nav li.active { border-left: 4px solid var(--accent); background: var(--sidebar-hover); }
 
-        #reading-pane { border-top: 1px solid #eee; padding-top: 20px; }
-        .btn-back { background: none; color: var(--accent); width: auto; padding: 0; margin-bottom: 10px; text-decoration: underline; }
+        main { padding: 0; overflow-y: auto; background: white; }
+
+        /* EMAIL LIST TABLE */
+        .email-table { width: 100%; border-collapse: collapse; }
+        .email-row { border-bottom: 1px solid var(--border); cursor: pointer; }
+        .email-row:hover { background: #f1f4f9; }
+        .email-row td { padding: 15px; font-size: 0.9rem; }
+        .unread { font-weight: bold; }
+        .time-col { color: #999; text-align: right; width: 100px; }
+
+        /* READING VIEW */
+        .email-content { padding: 40px; max-width: 800px; }
+        .email-header { border-bottom: 1px solid var(--border); margin-bottom: 20px; padding-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen" class="container">
-        <h1>ÖestVèl Centrè Portal</h1>
-        <span class="sub-text">Setup your @ostvl.ov identity</span>
-        
-        <label>Full Name</label>
-        <input type="text" id="user-name" class="standard-input" placeholder="e.g. Jess" required>
-
-        <label>Work Email</label>
-        <div class="input-group">
-            <input type="text" id="user-handle" placeholder="username" required>
-            <div class="domain-suffix">@ostvl.ov</div>
+    <div id="login-page">
+        <div class="login-box">
+            <h1>ÖestVèl Mail</h1>
+            <p style="font-size: 0.8rem; color: #7f8c8d;">Access your secure workstation node.</p>
+            
+            <input type="text" id="full-name" class="input-group" style="width:100%; border:1px solid #ddd; padding:12px; margin-bottom:0;" placeholder="Full Name">
+            
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Employee ID / User">
+                <div class="domain">@ostvl.ov</div>
+            </div>
+            
+            <button class="btn-login" onclick="login()">Initialize System</button>
+            <p style="text-align:center; font-size: 11px; color: #95a5a6; margin-top:20px;">
+                License Balance: VC€ 0.00 | Location: Bath/Bargh
+            </p>
         </div>
-        
-        <button onclick="handleSignUp()">Activate Simulator</button>
-        <p style="font-size: 0.7rem; text-align: center; color: #bdc3c7; margin-top: 15px;">
-            Connection Fee: VC€ 0.00 | Secure Node: Bath/Bargh
-        </p>
     </div>
 
-    <div id="app-screen" class="container hidden">
+    <div id="app-page" class="hidden">
         <header>
-            <h2 id="welcome-msg" style="margin:0; font-size: 1.2rem;">Inbox</h2>
-            <button style="width:auto; padding: 5px 10px; font-size: 0.8rem;" onclick="location.reload()">Logout</button>
+            <div style="font-weight: bold; letter-spacing: 1px;">ÖESTVÈL <span style="color:var(--accent)">CENTRÈ</span></div>
+            <div id="user-display" style="font-size: 0.85rem; color: #666;"></div>
         </header>
 
-        <div id="inbox-view">
-            <div id="email-list"></div>
-        </div>
+        <nav>
+            <ul>
+                <li class="active">📥 Inbox</li>
+                <li>📤 Sent</li>
+                <li>📝 Drafts</li>
+                <li>⚙️ Settings</li>
+                <li onclick="location.reload()" style="margin-top: 50px; color: #e74c3c;">Logout</li>
+            </ul>
+        </nav>
 
-        <div id="reading-pane" class="hidden">
-            <button class="btn-back" onclick="toggleView('inbox')">← Back to Inbox</button>
-            <h3 id="read-subject" style="margin-top:10px;"></h3>
-            <p id="read-sender" style="font-size: 0.8rem; color: #777;"></p>
-            <hr>
-            <div id="read-body" style="line-height: 1.5; font-size: 0.95rem;"></div>
-        </div>
+        <main id="main-content">
+            <div id="inbox-view">
+                <table class="email-table" id="email-list">
+                    </table>
+            </div>
+
+            <div id="reading-view" class="hidden">
+                <div class="email-content">
+                    <button onclick="showInbox()" style="border:none; background:none; color:var(--accent); cursor:pointer; margin-bottom:20px;">← Back to Inbox</button>
+                    <div class="email-header">
+                        <h2 id="view-subject" style="margin:0"></h2>
+                        <p id="view-meta" style="color:#666; font-size: 0.85rem;"></p>
+                    </div>
+                    <div id="view-body"></div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
-        const state = {
-            currentUser: "",
-            fullEmail: "",
-            emails: []
+        // MOCK DATABASE LOGIC
+        // This is where you would normally use fetch('your-sql-api-url')
+        const DB = {
+            saveUser: (user) => localStorage.setItem('ov_user', JSON.stringify(user)),
+            getUser: () => JSON.parse(localStorage.getItem('ov_user')),
+            getEmails: () => JSON.parse(localStorage.getItem('ov_emails')) || []
         };
 
-        function handleSignUp() {
-            const name = document.getElementById('user-name').value;
-            const handle = document.getElementById('user-handle').value;
+        function login() {
+            const name = document.getElementById('full-name').value;
+            const handle = document.getElementById('username').value;
 
-            if (!name || !handle) {
-                alert("Please provide both your name and preferred username.");
-                return;
+            if(!name || !handle) return alert("Credentials required.");
+
+            const userData = { name, email: `${handle}@ostvl.ov` };
+            DB.saveUser(userData);
+
+            // Create initial welcome mail if database is empty
+            if(DB.getEmails().length === 0) {
+                const welcome = {
+                    id: 1,
+                    from: "System Admin",
+                    subject: "Welcome to the Bath/Bargh Hub",
+                    body: `Hello ${name},<br><br>Your connection to the ÖestVèl Centrè is now stable. Your local balance is <b>VC€ 0.00</b>. Glad to have you back.<br><br>Best,<br>IT Support`,
+                    date: "Today"
+                };
+                localStorage.setItem('ov_emails', JSON.stringify([welcome]));
             }
 
-            state.currentUser = name;
-            state.fullEmail = `${handle}@ostvl.ov`;
+            initApp();
+        }
 
-            // Create the welcome email
-            const welcomeEmail = {
-                id: Date.now(),
-                sender: "Admin @ ÖestVèl Systems",
-                subject: "System Integration Confirmed",
-                body: `Hello ${name},<br><br>Success! Your simulation profile is now active at <strong>${state.fullEmail}</strong>.<br><br>We have successfully migrated the data to the new <strong>ÖestVèl Centrè (Bath/Bargh)</strong> servers.<br><br>Thank you for enjoying this email sim!<br><br>Regards,<br>IT Support`,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-
-            state.emails.push(welcomeEmail);
-
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('app-screen').classList.remove('hidden');
-            document.getElementById('welcome-msg').innerText = `Inbox (${state.fullEmail})`;
+        function initApp() {
+            const user = DB.getUser();
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('app-page').classList.remove('hidden');
+            document.getElementById('user-display').innerText = `${user.name} | ${user.email}`;
             renderInbox();
         }
 
         function renderInbox() {
             const list = document.getElementById('email-list');
-            list.innerHTML = "";
-
-            state.emails.forEach(email => {
-                const div = document.createElement('div');
-                div.className = "email-item";
-                div.onclick = () => openEmail(email.id);
-                div.innerHTML = `
-                    <span class="timestamp">${email.time}</span>
-                    <span class="sender">${email.sender}</span>
-                    <span class="subject">${email.subject}</span>
-                `;
-                list.appendChild(div);
-            });
+            const emails = DB.getEmails();
+            list.innerHTML = emails.map(e => `
+                <tr class="email-row unread" onclick="readEmail(${e.id})">
+                    <td style="width: 200px;">${e.from}</td>
+                    <td>${e.subject}</td>
+                    <td class="time-col">${e.date}</td>
+                </tr>
+            `).join('');
         }
 
-        function openEmail(id) {
-            const email = state.emails.find(e => e.id === id);
-            if (!email) return;
-
-            document.getElementById('read-subject').innerText = email.subject;
-            document.getElementById('read-sender').innerText = `From: ${email.sender}`;
-            document.getElementById('read-body').innerHTML = email.body;
-
-            toggleView('reading');
+        function readEmail(id) {
+            const email = DB.getEmails().find(e => e.id === id);
+            document.getElementById('inbox-view').classList.add('hidden');
+            document.getElementById('reading-view').classList.remove('hidden');
+            
+            document.getElementById('view-subject').innerText = email.subject;
+            document.getElementById('view-meta').innerText = `From: ${email.from} | Received: ${email.date}`;
+            document.getElementById('view-body').innerHTML = email.body;
         }
 
-        function toggleView(view) {
-            if (view === 'reading') {
-                document.getElementById('inbox-view').classList.add('hidden');
-                document.getElementById('reading-pane').classList.remove('hidden');
-            } else {
-                document.getElementById('inbox-view').classList.remove('hidden');
-                document.getElementById('reading-pane').classList.add('hidden');
-            }
+        function showInbox() {
+            document.getElementById('inbox-view').classList.remove('hidden');
+            document.getElementById('reading-view').classList.add('hidden');
+        }
+
+        // Check if already logged in on load
+        window.onload = () => {
+            if(DB.getUser()) initApp();
         }
     </script>
 </body>
