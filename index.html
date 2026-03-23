@@ -2,22 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bath Finder</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnBusOffBus | ÖestVèl’s Premier Transit</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <nav>
+        <div class="logo">OnBus<span>OffBus</span></div>
+        <ul>
+            <li><a href="#routes">Routes</a></li>
+            <li><a href="#tickets">Tickets</a></li>
+            <li><a href="#tracking">Live Map</a></li>
+        </ul>
+        <div class="currency-toggle">VC€ 1.00 = £0.51</div>
+    </nav>
 
-    <div id="map"></div>
+    <header class="hero">
+        <h1>Travel Across ÖestVèl.</h1>
+        <p>Connecting Harrogate, Scarborough, and London with zero friction.</p>
+        <div class="booking-bar">
+            <input type="text" placeholder="From: ÖestVèl Centrè">
+            <input type="text" placeholder="To: Scarborough">
+            <button class="cta-btn">Book for VC€ 15.00</button>
+        </div>
+    </header>
 
-    <div class="controls">
-        <button onclick="filterType('bus')">🚌 Buses</button>
-        <button onclick="filterType('water')">💧 Water</button>
-        <button onclick="filterType('shop')">🛒 Shops</button>
-    </div>
+    <section id="routes" class="features">
+        <div class="card">
+            <h3>The Royal Loop</h3>
+            <p>Direct service from ÖestVèl Centrè to the London expansion.</p>
+        </div>
+        <div class="card">
+            <h3>Coastal Express</h3>
+            <p>Daily runs to Scarborough for just VC€ 12.50.</p>
+        </div>
+        <div class="card">
+            <h3>Bath Connection</h3>
+            <p>Our newest route, launching mid-December.</p>
+        </div>
+    </section>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="script.js"></script>
+    <footer>
+        <p>&copy; 2026 OnBusOffBus Transit. Serving the Queen of ÖestVèl.</p>
+    </footer>
 </body>
 </html>
