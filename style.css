@@ -1,31 +1,48 @@
-:root {
-    --velic-blue: #003366;
-    --velic-gold: #C5A059;
+body {
+    background-color: #f0f2f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px;
 }
 
-body { margin: 0; font-family: 'Helvetica', sans-serif; background: #f4f4f4; }
-
-nav {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 15px 5%; background: var(--velic-blue); color: white;
+.clock-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 450px;
 }
 
-.badge { padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; background: #555; }
-
-.hero { padding: 40px 5%; background: white; text-align: center; border-bottom: 3px solid var(--velic-gold); }
-
-.map-container { position: relative; width: 100%; height: 500px; }
-#map { width: 100%; height: 100%; }
-
-.map-overlay {
-    position: absolute; top: 20px; left: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 20px; border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    z-index: 2;
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
 }
 
-.cta-btn {
-    background: var(--velic-blue); color: white;
-    border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;
+.location-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.location-name {
+    font-weight: 600;
+    color: #34495e;
+}
+
+.time-val {
+    font-family: 'Courier New', Courier, monospace;
+    color: #e67e22;
+    font-weight: bold;
+}
+
+.footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #95a5a6;
 }
