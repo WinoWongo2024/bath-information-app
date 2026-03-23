@@ -1,51 +1,31 @@
 :root {
     --velic-blue: #003366;
     --velic-gold: #C5A059;
-    --white: #ffffff;
 }
 
-body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { margin: 0; font-family: 'Helvetica', sans-serif; background: #f4f4f4; }
 
 nav {
-    display: flex; 
-    justify-content: space-between; 
-    padding: 20px 5%;
-    background: var(--velic-blue);
-    color: white;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 5%; background: var(--velic-blue); color: white;
 }
 
-.logo span { color: var(--velic-gold); font-weight: bold; }
+.badge { padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; background: #555; }
 
-.hero {
-    height: 60vh;
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('bus-bg.jpg');
-    background-size: cover;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    text-align: center;
+.hero { padding: 40px 5%; background: white; text-align: center; border-bottom: 3px solid var(--velic-gold); }
+
+.map-container { position: relative; width: 100%; height: 500px; }
+#map { width: 100%; height: 100%; }
+
+.map-overlay {
+    position: absolute; top: 20px; left: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px; border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 2;
 }
-
-.booking-bar {
-    background: white;
-    padding: 20px;
-    border-radius: 50px;
-    display: flex;
-    gap: 10px;
-}
-
-.booking-bar input { border: 1px solid #ccc; padding: 10px; border-radius: 5px; }
 
 .cta-btn {
-    background: var(--velic-gold);
-    border: none;
-    padding: 10px 25px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: bold;
+    background: var(--velic-blue); color: white;
+    border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;
 }
-
-.features { display: flex; justify-content: space-around; padding: 50px 5%; }
-.card { border: 1px solid #eee; padding: 20px; width: 25%; border-radius: 10px; text-align: center; }
