@@ -1,35 +1,52 @@
-// Initialize the map centered on Bath, UK
-const map = L.map('map').setView([51.3758, -2.3599], 14);
-
-// Add OpenStreetMap tiles
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-
-// Placeholder data for Bath
 const locations = [
-    { name: "Bath Spa Station (Bus)", type: "bus", lat: 51.3776, lng: -2.3568 },
-    { name: "Roman Baths Water Point", type: "water", lat: 51.3812, lng: -2.3595 },
-    { name: "Milsom Street Shops", type: "shop", lat: 51.3846, lng: -2.3615 }
+    "John O'groats", // +10
+    "Edinburgh",     // +20
+    "Newcastle",     // +30
+    "Manchester",    // +40
+    "Bristol",       // +50
+    "Bath",          // Base (Standard)
+    "London",        // +60
+    "Penzance"       // +70
 ];
 
-// Function to drop markers
-function loadMarkers(filter = 'all') {
-    // Clear existing markers logic would go here
-    locations.forEach(loc => {
-        if (filter === 'all' || loc.type === filter) {
-            L.marker([loc.lat, loc.lng])
-                .addTo(map)
-                .bindPopup(`<b>${loc.name}</b><br>Type: ${loc.type}`);
+function updateClocks() {
+    const listContainer = document.getElementById('location-list');
+    listContainer.innerHTML = ''; // Clear existing
+    
+    const now = new Date();
+
+    locations.forEach((city, index) => {
+        let offsetMinutes;
+        
+        // Logical rule: Bath is index 5. 
+        // Others are increments of 10 from the top (index 0 = +10)
+        // Except Bath stays at the "current" time.
+        if (city === "Bath") {
+            offsetMinutes = 0;
+        } else {
+            // Index 0=10, 1=20, 2=30, 3=40, 4=50, 6=60, 7=70
+            offsetMinutes = (index < 5) ? (index + 1) * 10 : index * 10;
         }
+
+        const cityTime = new Date(now.getTime() + offsetMinutes * 60000);
+        
+        const timeString = cityTime.toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: false 
+        });
+
+        const row = document.createElement('div');
+        row.className = 'location-row';
+        row.innerHTML = `
+            <span class="location-name">${city}</span>
+            <span class="time-val">${timeString}</span>
+        `;
+        listContainer.appendChild(row);
     });
 }
 
-function filterType(type) {
-    console.log("Filtering for:", type);
-    // Future: Clear map and reload specific markers
-    loadMarkers(type);
-}
-
-// Initial load
-loadMarkers();
+// Update every second
+setInterval(updateClocks, 1000);
+updateClocks();
